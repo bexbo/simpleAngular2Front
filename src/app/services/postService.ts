@@ -16,7 +16,9 @@ export class PostService {
 
     getPosts():Observable<TaskObject[]>{
         return this.http.get('http://localhost:8888/simpleLaravelBack/public/api/getObjects')
-            .map((res:Response) => res.json());
+            .map((res: Response)=>res.json());
 
     }
+
+
 }

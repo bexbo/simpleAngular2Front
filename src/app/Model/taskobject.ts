@@ -1,18 +1,14 @@
 export class TaskObject {
+    type: String;
+    id: number;
+    values: Array<String>;
+    other_values:Array<Object>;
 
 
-
-    constructor(
-        public id: number,
-        public type: string,
-        public values:{key:number, value:string}[],
-        public others:{key:string, value:string}[]
-
-        ){
-        console.log(this.id)
+    constructor(){
+        this.values = new Array<String>();
+        this.other_values = new Array<Object>();
     }
 
-    getID(){
-        return this.id;
-    }
+
 }
