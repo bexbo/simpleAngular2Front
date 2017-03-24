@@ -1,0 +1,70 @@
+<style>form {
+    margin: 4em;
+    padding: 4em 2em;
+    border: 2px solid black;
+
+}</style> <!-- added so the forms are separated by some padding-->
+
+<form (submit)="createNew(type.value, num.value)"> <!-- creates a new TaskObject-->
+    <label>type</label>
+    <input type="text" #type><br>
+    <label>Object number</label>
+    <input type ="text" #num><br>
+
+    <button type="submit">create new object</button><br>
+
+
+</form>
+
+
+<form *ngFor="let post of posts; let i =index" (submit)="updateObject(i)" > <!--For-loop that iterates over all the TaskObjects in posts[] -->
+
+    <label>Object number:</label>
+    <input type="text" [(ngModel)]="post.num" name="num" value={{post.num}} /><br> <!--All input field values are bound to the model but only changed in the DB when submitted -->
+    <label>type:</label>
+    <input type="text" name="type" value={{post.type}} #type/><br>
+
+    <p *ngFor="let value of post.values; let j=index; trackBy: customTrackBy"> <!--iterates over all the values on the TaskObject, only works with trackBy-->
+        <label>Value_{{j+1}}:</label>
+
+
+        <input type="text" [(ngModel)]="posts[i].values[j]"  name={{i}}_{{j}}/><br>
+    </p>
+
+    <form (submit)="pushValue(i, newvalue.value)"><!--Pushes new value to post.values[] on submission -->
+
+        <label>new value</label>
+        <input type="text" #newvalue>
+        <button type="submit">add new value</button>
+    </form>
+
+
+    <p *ngFor="let other_value of post.other_values|keys, trackBy: customTrackBy"> <!-- iterates over post.other_values, needs custom pipe called key to iterate and read, only works with trackBy-->
+        <label>{{other_value.key}}</label>
+        {{j}}
+        <input type = "text" name ="other_value" value={{other_value.value}}>
+        <br>
+    </p>
+
+    <form (submit)="pushOtherValue(i, newkey.value,newother.value)">
+        <label>new key</label>
+        <input type="text" #newkey><br>
+
+        <label>new value</label>
+        <input type="text" #newother><br>
+        <button type="submit">add new other_value</button> <!--submits any changes made to the TaskObject-->
+    </form>
+
+    <button type="submit">submit</button>
+    <button type="button" (click)="deleteObject(i)">delete</button> <!--//delete button-->
+
+</form >
+
+
+
+
+
+
+
+
+

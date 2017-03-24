@@ -1,89 +1,28 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import {PostService} from '../app/services/postService';
-import {Observable} from "rxjs";
 import {TaskObject} from '../app/model/taskobject';
-import {KeysPipe} from '../app/model/ObjectPipe';
-import {EmitterService} from '../app/services/emitter.service';
-
-import {FormBuilder,Validators} from '@angular/forms';
-
 
 
 @Component({
   selector: 'my-app',
-  template: `<h1>Hello {{name}}</h1>
-    
-    <div name="'Object">
-    <ul>
-        
-        <li *ngFor="let value of values; let i = index">
-        <label>Value:{{i+1}} is {{value}} </label>
-          
-        </li>
-        <form (submit)="addValue(thing.value)">
-          
-            <input type="text" #thing/>
-            
-         </form>   
-    
-    </ul> 
-    </div>
-   <form *ngFor="let post of posts; let i =index" (submit)="addValue(post.values[1])" >
-  
-   <label>id:</label>
-   <input type="text" name="id" value={{post.id}} #id/><br>
-   <label>type:</label>
-   <input type="text" name="type" value={{post.type}} #type/><br>
-   
-   <p *ngFor="let value of post.values; let j= index">
-        <label>Value_{{j+1}}:</label>
-        
-        
-        <input type="text" [(ngModel)]="post.values[j]" name={{j}} value={{value}} /><br>
-   </p>
-   
-   
-   
-   <p *ngFor="let other_value of post.other_values|keys">
-  <label>{{other_value.key}}</label>
-   <input type = "text" name ="other_value" value={{other_value.value}}>
-   <br>
-    </p>
-   
-   
-   <button type="submit">submit</button>
-   </form >
-   
-     
-    
-   
-   
-   
-    
-           
+  templateUrl: '../app/app.component.html',
 
-`,
-
-    providers: [PostService],
+  providers: [PostService]
 
 })
-export class AppComponent {
-    name: string;
-    values: string[];
-    otherValues: string;
+export class AppComponent implements OnInit{
+
+
     posts: TaskObject[];
-    formValues: any;
 
 
 
     constructor(private postService: PostService) {
-        this.name = 'Grodan boll';
-        this.values = ['foo', 'goo'];
-        this.otherValues = 'idk';
+    }
 
+    ngOnInit(){
 
-
-        this.postService.getPosts().subscribe(posts => {
+        this.postService.getPosts().subscribe(posts => {     //gets all the taskobjects from previous sessions from the backend
             this.posts = this.convertTaskResponse(posts);
 
         });
@@ -92,7 +31,7 @@ export class AppComponent {
 
 
     }
-    convertTaskResponse(response: Array<Object>):TaskObject[]{
+    convertTaskResponse(response: Array<Object>):TaskObject[]{//converts array of JSON-objects to array of TaskObjects
 
         let tasks = new Array<TaskObject>();
         for (let taskObject of response){
@@ -106,31 +45,96 @@ export class AppComponent {
 
     }
 
-    convertTaskObject(object:Object) :TaskObject{
+    convertTaskObject(object:Object) :TaskObject{ //converts a single JSON-object to a single TaskObject
         let newTaskObject = new TaskObject();
-        newTaskObject.id=object["id"];
+        newTaskObject.num=object["num"];
         newTaskObject.type=object["type"];
-        newTaskObject.other_values=object["other_values"];
-        for (let key in object){
-            if(key.substring(0,6)=="value_"){
-                newTaskObject.values.push(object[key]);
+        newTaskObject.unique_id=object["unique_id"];
 
-            }
-
+        if(object["other_values"]!=null) {     //back-end will set other_values= null when empty
+            newTaskObject.other_values = object["other_values"];
         }
+        if(object["values"]!=null) { //back-end will set values= null when empty
+            newTaskObject.values = object["values"];
+        }
+
+
+
         return newTaskObject;
 
 
 
     }
-    addValue(newvalue: string) {
 
-        this.values.push(newvalue);
+
+
+   pushValue(index:number, value:string){ //pushes new value to taskobject at index "index" in posts and sends object to backend
+
+
+       this.posts[index].values.push(value);
+
+
+       this.postService.updateObject(this.posts[index]).subscribe(() => {
+
+       });
+
+   }
+   pushOtherValue(index:number, newkey:string, newvalue:string){ //pushes new value to taskobject at index "index" in posts and sends object to backend
+
+
+       this.posts[index].other_values[newkey]=newvalue;
+
+       this.postService.updateObject(this.posts[index]).subscribe(() => {
+
+       });
+
+   }
+
+
+
+
+    updateObject(index: number){ //is used in template to send the updated data to backend
+
+        let object = this.posts[index];
+        this.postService.updateObject(object).subscribe(() => {
+
+        });
+
+
+    }
+    createNew (type: string, num:number){ //is used in template to create new object
+        let taskObject= new TaskObject();
+        taskObject.num = num;
+        taskObject.type= type;
+
+        this.postService.createObject(taskObject).subscribe(post => {  //posts to back-end which returns TaskObject-JSON with unique id
+
+            this.posts.push(this.convertTaskObject(post));
+
+        });
+
+
+
+
+
+
+
     }
 
-    submitform(){
-        this.formValues = this.completeForm.formValues;
+    customTrackBy(index: number, obj: any): any {//is used to track values in ngFor
+        return index;
     }
+
+    deleteObject(index: number){ //is used in template to delete object
+
+        this.postService.deleteObject(this.posts[index]).subscribe(() => {
+        });
+
+        this.posts.splice(index,1);
+
+
+
+        }
 
 
 }
