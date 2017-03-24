@@ -1,12 +1,12 @@
-#Simple Angular 2 front-end
+# Simple Angular 2 front-end
 
-##Prerequisites
+## Prerequisites
 
-*Node js and npm which can be found [here](https://docs.npmjs.com/getting-started/installing-node)
-*[SimpleLaravelBack](https://github.com/bexbo/simpleLaravelBack) which is the back-end REST-api for this program.
+* Node js and npm which can be found [here](https://docs.npmjs.com/getting-started/installing-node)
+* [SimpleLaravelBack](https://github.com/bexbo/simpleLaravelBack) which is the back-end REST-api for this program.
 
 
-##Installation
+## Installation
 Open up your terminal and clone this repository to a folder of your choosing, then go to the folder
 ```shell
 git clone https://github.com/bexbo/simpleAngular2Front myFolder
